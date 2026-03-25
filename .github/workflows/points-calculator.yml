@@ -1,0 +1,152 @@
+name: 🎮 Points Calculator
+
+on:
+  issues:
+    types: [opened, closed]
+  pull_request:
+    types: [opened, closed, merged]
+  issue_comment:
+    types: [created]
+  push:
+    branches: [main]
+
+jobs:
+  calculate-points:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Calculate Points
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = './points-log.json';
+            
+            // 读取现有积分记录
+            let pointsData = {};
+            if (fs.existsSync(path)) {
+              pointsData = JSON.parse(fs.readFileSync(path, 'utf8'));
+            }
+            
+            const { eventName, payload } = context;
+            let points = 0;
+            let reason = '';
+            let user = '';
+            
+            // 根据不同事件计算积分
+            switch(eventName) {
+              case 'issues':
+                user = payload.issue.user.login;
+                if (payload.action === 'opened') {
+                  points = 5;
+                  reason = '创建任务';
+                } else if (payload.action === 'closed') {
+                  points = 15;
+                  reason = '完成任务';
+                }
+                break;
+                
+              case 'pull_request':
+                user = payload.pull_request.user.login;
+                if (payload.action === 'opened') {
+                  points = 10;
+                  reason = '提交PR';
+                } else if (payload.pull_request.merged) {
+                  points = 25;
+                  reason = 'PR被合并';
+                }
+                break;
+                
+              case 'issue_comment':
+                user = payload.comment.user.login;
+                points = 3;
+                reason = '参与讨论';
+                break;
+                
+              case 'push':
+                user = payload.pusher.name;
+                const commitCount = payload.commits?.length || 1;
+                points = commitCount * 5;
+                reason = `提交${commitCount}个commit`;
+                break;
+            }
+            
+            if (points > 0 && user) {
+              // 更新用户积分
+              if (!pointsData[user]) {
+                pointsData[user] = { total: 0, history: [], level: 1 };
+              }
+              
+              pointsData[user].total += points;
+              pointsData[user].history.push({
+                date: new Date().toISOString(),
+                points: points,
+                reason: reason,
+                event: eventName
+              });
+              
+              // 计算等级
+              const total = pointsData[user].total;
+              pointsData[user].level = Math.floor(total / 100) + 1;
+              
+              // 保存
+              fs.writeFileSync(path, JSON.stringify(pointsData, null, 2));
+              
+              console.log(`✅ ${user} 获得 ${points} 分: ${reason}`);
+              console.log(`📊 总分: ${pointsData[user].total}, 等级: ${pointsData[user].level}`);
+              
+              // 设置输出
+              core.setOutput('user', user);
+              core.setOutput('points', points);
+              core.setOutput('reason', reason);
+              core.setOutput('total', pointsData[user].total);
+            }
+
+      - name: Update Leaderboard
+        run: |
+          node -e "
+            const fs = require('fs');
+            const data = JSON.parse(fs.readFileSync('./points-log.json', 'utf8'));
+            
+            // 生成排行榜
+            const leaderboard = Object.entries(data)
+              .map(([user, info]) => ({ user, ...info }))
+              .sort((a, b) => b.total - a.total);
+            
+            // 生成 Markdown
+            let md = '# 🏆 积分榜\n\n';
+            md += '| 排名 | 玩家 | 等级 | 总分 | 成就 |\n';
+            md += '|------|------|------|------|------|\n';
+            
+            const badges = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+            leaderboard.slice(0, 10).forEach((entry, i) => {
+              const badge = badges[i] || `${i+1}`;
+              const achievements = entry.total >= 500 ? '🌟' : entry.total >= 300 ? '⭐' : entry.total >= 100 ? '✨' : '';
+              md += '| ' + badge + ' | @' + entry.user + ' | Lv.' + entry.level + ' | ' + entry.total + ' | ' + achievements + ' |\n';
+            });
+            
+            md += '\n\n## 📈 等级规则\n\n';
+            md += '- Lv.1: 0-99 分\n';
+            md += '- Lv.2: 100-199 分\n';
+            md += '- Lv.3: 200-299 分\n';
+            md += '- Lv.4: 300-499 分\n';
+            md += '- Lv.5+: 500+ 分 🌟\n';
+            
+            fs.writeFileSync('./LEADERBOARD.md', md);
+            console.log('🏆 排行榜已更新');
+          "
+
+      - name: Commit Changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add points-log.json LEADERBOARD.md
+          git diff --staged --quiet || git commit -m "🎮 Update points and leaderboard"
+          git push

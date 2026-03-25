@@ -1,0 +1,22 @@
+{
+  "name": "gamified-learning-group",
+  "version": "1.0.0",
+  "description": "游戏化学习小组 - GitHub + Obsidian 协作系统",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yefangjie/gamified-learning-group.git"
+  },
+  "keywords": [
+    "learning",
+    "gamification",
+    "obsidian",
+    "github",
+    "education",
+    "collaboration"
+  ],
+  "author": "Learning Group",
+  "license": "MIT"
+}
