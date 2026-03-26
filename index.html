@@ -1,51 +1,229 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>游戏化学习小组</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: white;
-            text-align: center;
-        }
-        .banner {
-            background: linear-gradient(90deg, #ff6b6b, #feca57);
-            padding: 20px;
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-        .teacher { color: #fff9c4; }
-        .container { padding: 50px 20px; }
-        h1 { font-size: 3em; margin: 30px 0; }
-        p { font-size: 1.2em; margin-bottom: 30px; }
-        .btn {
-            display: inline-block;
-            background: white;
-            color: #667eea;
-            padding: 15px 30px;
-            text-decoration: none;
-            border-radius: 30px;
-            margin: 10px;
-            font-weight: bold;
-            transition: transform 0.3s;
-        }
-        .btn:hover { transform: scale(1.05); }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>游戏化学习小组 | Gamified Learning Group</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+    
+    /* 🎉 动态欢迎 Banner */
+    .welcome-banner {
+      background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff6b6b);
+      background-size: 300% 100%;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 1.5em;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      animation: shimmer 3s linear infinite;
+      border-bottom: 4px solid #fff;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: 0% center; }
+      100% { background-position: 300% center; }
+    }
+    
+    .welcome-banner .teacher-name {
+      font-size: 1.3em;
+      color: #fff9c4;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+      padding: 0 10px;
+    }
+    
+    .welcome-banner .weekday {
+      font-size: 0.9em;
+      opacity: 0.9;
+      margin-right: 10px;
+    }
+    
+    /* 周末特殊样式 */
+    .welcome-banner.weekend {
+      background: linear-gradient(90deg, #1dd1a1, #10ac84, #1dd1a1);
+      background-size: 300% 100%;
+    }
+    
+    /* 主容器 */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    
+    /* 标题区域 */
+    .hero {
+      text-align: center;
+      padding: 60px 20px;
+      color: white;
+    }
+    
+    .hero h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    }
+    
+    .hero p {
+      font-size: 1.3em;
+      opacity: 0.95;
+    }
+    
+    /* 卡片区域 */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+    
+    .card {
+      background: rgba(255,255,255,0.95);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+    }
+    
+    .card h2 {
+      color: #667eea;
+      margin-bottom: 15px;
+      font-size: 1.5em;
+    }
+    
+    .card p {
+      color: #666;
+      line-height: 1.6;
+    }
+    
+    .card a {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 24px;
+      transition: opacity 0.3s;
+    }
+    
+    .card a:hover {
+      opacity: 0.9;
+    }
+    
+    /* 页脚 */
+    footer {
+      text-align: center;
+      padding: 40px;
+      color: rgba(255,255,255,0.8);
+      margin-top: 60px;
+    }
+    
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2em; }
+      .welcome-banner { font-size: 1.1em; padding: 15px; }
+    }
+  </style>
 </head>
 <body>
-    <div class="banner">
-        🎉 热烈欢迎 <span class="teacher">王依民老师</span> 莅临指导！🎉
+  <!-- 🎉 动态欢迎 Banner -->
+  <div class="welcome-banner" id="welcomeBanner">
+    <span class="weekday" id="weekdayText"></span>
+    <span id="welcomeText">加载中...</span>
+  </div>
+
+  <div class="hero">
+    <h1>🎮 游戏化学习小组</h1>
+    <p>28天系统化培训，从0到1建立个人品牌和技术栈</p>
+  </div>
+
+  <div class="container">
+    <div class="cards">
+      <div class="card">
+        <h2>📅 课程安排</h2>
+        <p>查看完整的28天学习计划，包括每日任务和打卡要求。</p>
+        <a href="SCHEDULE.md">查看课表</a>
+      </div>
+      
+      <div class="card">
+        <h2>📝 游戏规则</h2>
+        <p>了解积分系统、等级制度和奖励机制，让学习更有趣！</p>
+        <a href="docs/rules.md">查看规则</a>
+      </div>
+      
+      <div class="card">
+        <h2>🚀 快速开始</h2>
+        <p>新手指南，帮助你快速加入并开始学习之旅。</p>
+        <a href="docs/onboarding.md">开始上手</a>
+      </div>
     </div>
-    <div class="container">
-        <h1>🎮 游戏化学习小组</h1>
-        <p>28天系统化培训，从0到1建立个人品牌和技术栈</p>
-        <a href="SCHEDULE.md" class="btn">📅 查看课程表</a>
-        <a href="docs/rules.md" class="btn">📝 游戏规则</a>
-    </div>
+  </div>
+
+  <footer>
+    <p>🦞 由 OpenClaw AI 协助构建 | 2026</p>
+  </footer>
+
+  <script>
+    // 动态欢迎语配置
+    const welcomeConfig = {
+      1: { text: "🎉 热烈欢迎", teacher: "王依民老师", emoji: "👨‍🏫" },      // 周一
+      2: { text: "🎉 热烈欢迎", teacher: "李康南老师", emoji: "👩‍🏫" },      // 周二
+      3: { text: "🎉 热烈欢迎", teacher: "张志恒老师", emoji: "👨‍💼" },      // 周三
+      4: { text: "🎉 热烈欢迎", teacher: "叶芳杰老师", emoji: "👩‍💼" },      // 周四
+      5: { text: "🎉 热烈欢迎", teacher: "王升锋老师", emoji: "👨‍🎓" },      // 周五
+      6: { text: "🌿 周末愉快！", teacher: "大家休息一下", emoji: "☕" },   // 周六
+      0: { text: "🌿 周末愉快！", teacher: "大家休息一下", emoji: "☕" }    // 周日
+    };
+    
+    const weekdayNames = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+    
+    function updateWelcomeBanner() {
+      const now = new Date();
+      const dayOfWeek = now.getDay(); // 0=周日, 1=周一, ..., 6=周六
+      const config = welcomeConfig[dayOfWeek];
+      const banner = document.getElementById('welcomeBanner');
+      const weekdayText = document.getElementById('weekdayText');
+      const welcomeText = document.getElementById('welcomeText');
+      
+      // 更新星期显示
+      weekdayText.textContent = `[${weekdayNames[dayOfWeek]}]`;
+      
+      // 更新欢迎语
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        // 周末
+        banner.classList.add('weekend');
+        welcomeText.innerHTML = `${config.emoji} ${config.text} ${config.teacher} ${config.emoji}`;
+      } else {
+        // 工作日
+        banner.classList.remove('weekend');
+        welcomeText.innerHTML = `${config.emoji} ${config.text} <span class="teacher-name">${config.teacher}</span> 莅临指导！${config.emoji}`;
+      }
+    }
+    
+    // 页面加载时更新
+    updateWelcomeBanner();
+    
+    // 每分钟检查一次（跨天时自动更新）
+    setInterval(updateWelcomeBanner, 60000);
+  </script>
 </body>
 </html>
